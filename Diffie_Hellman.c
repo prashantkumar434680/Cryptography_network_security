@@ -1,6 +1,7 @@
 #include <stdio.h>
+#include <string.h>
 
-// Function for modular exponentiation: (base^exp) % mod
+// Modular exponentiation
 long long power(long long base, long long exp, long long mod) {
     long long result = 1;
     base = base % mod;
@@ -12,50 +13,64 @@ long long power(long long base, long long exp, long long mod) {
         base = (base * base) % mod;
         exp = exp / 2;
     }
-
     return result;
 }
 
+// XOR Encryption/Decryption
+void xorCipher(char text[], long long key) {
+    for(int i = 0; text[i] != '\0'; i++) {
+        text[i] = text[i] ^ key;
+    }
+}
+
 int main() {
-    long long P, G;     // Public values
-    long long a, b;     // Private keys
-    long long x, y;     // Public keys
-    long long ka, kb;   // Shared keys
+    long long P, G;
+    long long a, b;
+    long long x, y;
+    long long ka, kb;
+
+    char message[100];
 
     printf("--- Diffie-Hellman Key Exchange ---\n");
 
-    // 1. Public values
-    printf("Enter a prime number (P): ");
+    // Public values
+    printf("Enter prime number (P): ");
     scanf("%lld", &P);
 
-    printf("Enter a primitive root (G): ");
+    printf("Enter primitive root (G): ");
     scanf("%lld", &G);
 
-    // 2. Private keys
-    printf("\nEnter Alice's private key (a): ");
+    // Private keys
+    printf("Enter Alice private key (a): ");
     scanf("%lld", &a);
 
-    printf("Enter Bob's private key (b): ");
+    printf("Enter Bob private key (b): ");
     scanf("%lld", &b);
 
-    // 3. Public keys
-    x = power(G, a, P);  // Alice's public key
-    y = power(G, b, P);  // Bob's public key
+    // Public keys
+    x = power(G, a, P);
+    y = power(G, b, P);
 
-    printf("\nAlice's Public Key (x): %lld\n", x);
-    printf("Bob's Public Key (y): %lld\n", y);
+    printf("\nAlice Public Key: %lld\n", x);
+    printf("Bob Public Key: %lld\n", y);
 
-    // 4. Shared secret
-    ka = power(y, a, P); // Alice computes
-    kb = power(x, b, P); // Bob computes
+    // Shared key
+    ka = power(y, a, P);
+    kb = power(x, b, P);
 
-    printf("\nShared Key (Alice): %lld\n", ka);
-    printf("Shared Key (Bob): %lld\n", kb);
+    printf("\nShared Key: %lld\n", ka);
 
-    if (ka == kb)
-        printf("\nSuccess! Shared keys match.\n");
-    else
-        printf("\nError! Keys do not match.\n");
+    // Input message
+    printf("\nEnter message: ");
+    scanf(" %[^\n]", message);
+
+    // Encryption
+    xorCipher(message, ka);
+    printf("Encrypted Message: %s\n", message);
+
+    // Decryption
+    xorCipher(message, ka);
+    printf("Decrypted Message: %s\n", message);
 
     return 0;
 }

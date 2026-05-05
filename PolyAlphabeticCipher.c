@@ -2,6 +2,27 @@
 #include <string.h>
 #include <ctype.h>
 
+
+void polyAlphaDec(char text[], char key[]) {
+    int textLen = strlen(text);
+    int keyLen = strlen(key);
+
+    for (int i = 0, j = 0; i < textLen; i++) {
+        char currentByte = text[i];
+
+        if (isalpha(currentByte)) {
+            char base = isupper(currentByte) ? 'A' : 'a';
+
+            int k = toupper(key[j % keyLen]) - 'A';
+
+            // Decryption: Pi = (Ci - Ki + 26) % 26
+            text[i] = (currentByte - base - k + 26) % 26 + base;
+
+            j++; // move key only for letters
+        }
+    }
+}
+
 void polyAlphaEnc(char text[], char key[]) {
     int textLen = strlen(text);
     int keyLen = strlen(key);
@@ -26,6 +47,7 @@ void polyAlphaEnc(char text[], char key[]) {
     }
 }
 
+
 int main(){
     char message[100];
     char key[50];
@@ -37,8 +59,13 @@ int main(){
     printf("Enter Keyword: ");
     scanf("%s", key);
 
+    // Encrypt
     polyAlphaEnc(message, key);
-
     printf("Encrypted Message: %s\n", message);
+
+    // Decrypt
+    polyAlphaDec(message, key);
+    printf("Decrypted Message: %s\n", message);
+
     return 0;
 }

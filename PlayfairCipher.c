@@ -4,6 +4,24 @@
 
 #define SIZE 5
 
+void decrypt(char matrix[SIZE][SIZE], char c1, char c2) {
+    int r1, c1_pos, r2, c2_pos;
+    findPos(matrix, c1, &r1, &c1_pos);
+    findPos(matrix, c2, &r2, &c2_pos);
+
+    if (r1 == r2) // Same Row → shift left
+        printf("%c%c", matrix[r1][(c1_pos - 1 + 5) % 5],
+                        matrix[r2][(c2_pos - 1 + 5) % 5]);
+
+    else if (c1_pos == c2_pos) // Same Column → shift up
+        printf("%c%c", matrix[(r1 - 1 + 5) % 5][c1_pos],
+                        matrix[(r2 - 1 + 5) % 5][c2_pos]);
+
+    else // Rectangle rule (same as encryption)
+        printf("%c%c", matrix[r1][c2_pos],
+                        matrix[r2][c1_pos]);
+}
+
 // Generate the 5x5 key matrix
 void generateMatrix(char key[], char matrix[SIZE][SIZE]) {
     int dict[26] = {0};
@@ -53,20 +71,48 @@ void encrypt(char matrix[SIZE][SIZE], char p1, char p2) {
     else // Rectangle Rule
         printf("%c%c", matrix[r1][c2], matrix[r2][c1]);
 }
-
 int main() {
     char matrix[SIZE][SIZE];
     char key[] = "MONARCHY";
     char text[] = "INSTRUMENTS"; 
-    
+
     generateMatrix(key, matrix);
+
+    char encrypted[100];
+    int k = 0;
+
     printf("Ciphertext: ");
     for(int i = 0; i < strlen(text); i += 2) {
-        // If last character is alone, pair with 'X'
         char p1 = text[i];
         char p2 = (text[i+1] == '\0') ? 'X' : text[i+1];
-        encrypt(matrix, p1, p2);
+
+        int r1, c1, r2, c2;
+        findPos(matrix, p1, &r1, &c1);
+        findPos(matrix, p2, &r2, &c2);
+
+        if (r1 == r2) {
+            encrypted[k++] = matrix[r1][(c1 + 1) % 5];
+            encrypted[k++] = matrix[r2][(c2 + 1) % 5];
+        }
+        else if (c1 == c2) {
+            encrypted[k++] = matrix[(r1 + 1) % 5][c1];
+            encrypted[k++] = matrix[(r2 + 1) % 5][c2];
+        }
+        else {
+            encrypted[k++] = matrix[r1][c2];
+            encrypted[k++] = matrix[r2][c1];
+        }
     }
+    encrypted[k] = '\0';
+
+    printf("%s\n", encrypted);
+
+    //  Decryption
+    printf("Decrypted Text: ");
+    for(int i = 0; i < strlen(encrypted); i += 2) {
+        decrypt(matrix, encrypted[i], encrypted[i+1]);
+    }
+
     printf("\n");
     return 0;
 }

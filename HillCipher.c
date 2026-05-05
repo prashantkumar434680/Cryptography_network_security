@@ -1,30 +1,59 @@
-#include<stdio.h>
-#include<string.h>
-#include<ctype.h>
+#include <stdio.h>
 
-void encryptBlock(int key[2][2], int pt[2], int ct[2]){
-    ct[0] = (key[0][0] * pt[0] + key[1][0] * pt[1]) % 26;
-    ct[1] = (key[0][1] * pt[0] + key[1][1] * pt[1]) % 26;
+// Function to find modular inverse of a number under mod 26
+int modInverse(int det) {
+    det = det % 26;
+    for(int i = 1; i < 26; i++) {
+        if((det * i) % 26 == 1)
+            return i;
+    }
+    return -1; // No inverse exists
 }
 
-int main(){
-    int key[2][2] = {{3,3}, {2,5}};
-    char message[] = "HILL";
-    int n = strlen(message);
+// Function to find inverse of 2x2 matrix
+void findInverse(int key[2][2], int invKey[2][2]) {
+    int det = (key[0][0]*key[1][1] - key[0][1]*key[1][0]) % 26;
 
-    printf("Plaintext: %s\n", message);
-    printf("CipherTest: ");
+    if(det < 0) det += 26;
 
-    for(int i=0;i<n;i+=2){
-        int p[2], c[2];
-        p[0] = toupper(message[i]) - 'A';
-        p[1] = toupper(message[i+1]) - 'A';
+    int invDet = modInverse(det);
 
-        encryptBlock(key, p, c);
-
-        // Convert Back to characters
-        printf("%c%c", c[0] + 'A', c[1] + 'A');
+    if(invDet == -1) {
+        printf("Inverse does not exist!\n");
+        return;
     }
-    printf("\n");
+
+    // Adjoint matrix
+    invKey[0][0] =  key[1][1];
+    invKey[0][1] = -key[0][1];
+    invKey[1][0] = -key[1][0];
+    invKey[1][1] =  key[0][0];
+
+    // Multiply by inverse of determinant and take mod 26
+    for(int i = 0; i < 2; i++) {
+        for(int j = 0; j < 2; j++) {
+            invKey[i][j] = (invKey[i][j] * invDet) % 26;
+
+            // Handle negative values
+            if(invKey[i][j] < 0)
+                invKey[i][j] += 26;
+        }
+    }
+}
+
+int main() {
+    int key[2][2] = {{3,3},{2,5}};
+    int invKey[2][2];
+
+    findInverse(key, invKey);
+
+    printf("Inverse Matrix:\n");
+    for(int i = 0; i < 2; i++) {
+        for(int j = 0; j < 2; j++) {
+            printf("%d ", invKey[i][j]);
+        }
+        printf("\n");
+    }
+
     return 0;
 }

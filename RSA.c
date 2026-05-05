@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-// Modular exponentiation: (base^exp) % mod
+// Modular exponentiation
 long long power(long long base, long long exp, long long mod) {
     long long result = 1;
     base = base % mod;
@@ -12,11 +12,10 @@ long long power(long long base, long long exp, long long mod) {
         base = (base * base) % mod;
         exp = exp / 2;
     }
-
     return result;
 }
 
-// GCD function
+// GCD
 long long gcd(long long a, long long b) {
     while (b != 0) {
         long long temp = b;
@@ -24,6 +23,16 @@ long long gcd(long long a, long long b) {
         a = temp;
     }
     return a;
+}
+
+// Encryption function
+long long encrypt(long long msg, long long e, long long n) {
+    return power(msg, e, n);
+}
+
+// Decryption function
+long long decrypt(long long cipher, long long d, long long n) {
+    return power(cipher, d, n);
 }
 
 int main() {
@@ -59,12 +68,12 @@ int main() {
     printf("\nEnter numeric message (< %lld): ", n);
     scanf("%lld", &msg);
 
-    // Encryption
-    long long cipher = power(msg, e, n);
+    // 🔐 Encryption
+    long long cipher = encrypt(msg, e, n);
     printf("Encrypted Data: %lld\n", cipher);
 
-    // Decryption
-    long long decrypted = power(cipher, d, n);
+    // 🔓 Decryption
+    long long decrypted = decrypt(cipher, d, n);
     printf("Decrypted Message: %lld\n", decrypted);
 
     return 0;
